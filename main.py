@@ -10,7 +10,8 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 PURPLE = (180, 0, 180)
-SKY = (143, 205, 255)
+SKY = (31, 155, 255)
+BROWN = (125, 44, 0)
 
 tile_size = 5
 # math constants
@@ -35,11 +36,12 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    for row in range(1,DISPLAY_WIDTH//tile_size):
-        for column in range(1, DISPLAY_HEIGHT//tile_size):
-
 
     screen.fill(SKY)
+
+    for row in range(1, DISPLAY_WIDTH//tile_size):
+        for column in range(1, DISPLAY_HEIGHT//tile_size):
+            pygame.draw.line(screen, WHITE, (DISPLAY_WIDTH//column, DISPLAY_HEIGHT,), (DISPLAY_WIDTH//column, 0), 5)
 
     pygame.display.flip()
 
