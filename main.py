@@ -40,8 +40,8 @@ for start in start_locations:
         # print(row_index, row)
         for col_index, col in enumerate(row):
             if col == 'x':
-                x_pos = col_index * PLATFORM_W
-                y_pos = row_index * PLATFORM_H + start
+                x_pos = col_index * PLATFORM_W + start
+                y_pos = row_index * PLATFORM_H + start//2
                 platform = sprites.Platform(screen, x_pos, y_pos, BROWN)
                 platform_group.add(platform)
                 all_sprites.add(platform_group)
@@ -51,8 +51,8 @@ for start in start_locations:
         # print(row_index, row)
         for col_index, col in enumerate(row):
             if col == 'x':
-                x_pos = col_index * PLATFORM_W + start
-                y_pos = row_index * PLATFORM_H
+                x_pos = col_index * PLATFORM_W + start//2
+                y_pos = row_index * PLATFORM_H + start
                 platform = sprites.Platform(screen, x_pos, y_pos, BROWN_2)
                 platform_group.add(platform)
                 all_sprites.add(platform_group)
