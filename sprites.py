@@ -74,10 +74,9 @@ class SpriteSheet:
 
 class Level:
     def __init__(self):
-        tile_sheet = SpriteSheet('assets/tilemap.png')
-        t_sheet_2 = SpriteSheet('assets/Ground.png')
-        block = tile_sheet.image_at((6, 7, 54, 50))
-        flower = t_sheet_2.image_at((0, 0, 30, 30))
+        tile_sheet = SpriteSheet('assets/Ground.png')
+        block = tile_sheet.image_at((32, 0, 30, 30))
+        flower = tile_sheet.image_at((0, 0, 30, 30))
         block = pygame.transform.scale(block, (TILE_SIZE, TILE_SIZE))
         flower = pygame.transform.scale(flower, (TILE_SIZE, TILE_SIZE))
 
