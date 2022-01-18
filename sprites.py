@@ -72,11 +72,36 @@ class SpriteSheet:
         return self.images_at(sprite_rects, colorkey)
 
 
-class Platform(pygame.sprite.Sprite):
-    def __init__(self, display, x, y, color):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((PLATFORM_H, PLATFORM_W))
-        self.image.fill(color)
-        self.rect = self.image.get_rect()
-        self.rect.center = x, y
-        pygame.draw.rect(display, color, [self.rect.x, self.rect.y, self.rect.width, self.rect.height])
+class Level:
+    def __init__(self):
+        tile_sheet = SpriteSheet('assets/tilemap.png')
+        t_sheet_2 = SpriteSheet('assets/Ground.png')
+        block = tile_sheet.image_at((6, 7, 54, 50))
+        flower = t_sheet_2.image_at((0, 0, 30, 30))
+        block = pygame.transform.scale(block, (TILE_SIZE, TILE_SIZE))
+        flower = pygame.transform.scale(flower, (TILE_SIZE, TILE_SIZE))
+
+        self.tile_list = []
+
+        for i, row in enumerate(LAYOUT):
+            for j, col in enumerate(row):
+                x_val = j * TILE_SIZE
+                y_val = i * TILE_SIZE
+
+                if col == "1":
+                    image_rect = block.get_rect()
+                    image_rect.x = x_val
+                    image_rect.y = y_val
+                    tile = (block, image_rect)
+                    self.tile_list.append(tile)
+
+                if col == "2":
+                    image_rect = flower.get_rect()
+                    image_rect.x = x_val
+                    image_rect.y = y_val
+                    tile = (flower, image_rect)
+                    self.tile_list.append(tile)
+
+    def update(self):
+        for tile in self.tile_list:
+            SCREEN.blit(tile[0], tile[1])
