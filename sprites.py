@@ -72,6 +72,32 @@ class SpriteSheet:
         return self.images_at(sprite_rects, colorkey)
 
 
+class Player(pygame.sprite.Sprite):
+    def __init__(self, image_path):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image = pygame.image.load(image_path)
+        self.rect = self.image.get_rect()
+        self.rect.center = WIN_WIDTH // 2, WIN_HEIGHT - self.rect.height*3
+        self.x_velo = 0  # velocity
+
+    def update(self):
+        self.rect.x += self.x_velo
+
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_RIGHT]:
+            self.x_velo = 5
+        elif keys[pygame.K_LEFT]:
+            self.x_velo = -5
+        else:
+            self.x_velo = 0
+
+        if self.rect.right >= WIN_WIDTH:
+            self.rect.right = WIN_WIDTH
+        if self.rect.left <= 0:
+            self.rect.left = 0
+
+
 class Level:
     def __init__(self):
         tile_sheet = SpriteSheet('assets/Ground.png')
@@ -104,3 +130,28 @@ class Level:
     def update(self):
         for tile in self.tile_list:
             SCREEN.blit(tile[0], tile[1])
+
+
+class LeftRun(pygame.sprite.Sprite):
+    def __init__(self, center):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = LEFT_RUNNING[0]
+        self.rect = self.image.get_rect()
+        self.rect.center = center
+        self.frame = 0
+        self.frame_delay = 50
+        self.kill_center = center
+        self.previous_update = pygame.time.get_ticks()
+
+    def update(self):
+        current_update = pygame.time.get_ticks()
+        if current_update - self.previous_update > self.frame_delay:
+            self.previous_update = current_update
+            self.frame += 1
+        if self.frame == len(LEFT_RUNNING):
+            self.kill()
+        else:
+            self.image = LEFT_RUNNING[self.frame]
+            self.rect = self.image.get_rect()
+            self.rect.center = self.kill_center
+
