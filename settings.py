@@ -47,7 +47,3 @@ LAYOUT = [
     '10000000000000000000000000000001',
     '11111111111111111111111111111111',
 ]
-LEFT_RUNNING = []
-for i in range(3):
-    image_path = pygame.image.load(f"assets/dodo_left_run_{i}.png")
-    LEFT_RUNNING.append(image_path)

@@ -16,8 +16,15 @@ pygame.display.set_caption("Platformer")
 # print(card_list)
 
 dodo = sprites.SpriteSheet("assets/dodo.png")
-
-
+x_margin = 3
+y_margin = 81
+x_pad = 7
+y_pad = 0
+width = 50
+height = 50
+left_run_1 = dodo.image_at((4, 80, 45, 50), -1)
+left_run_2 = dodo.image_at((50, 75, 45, 50), -1)
+left_run_3 = dodo.image_at((100, 80, 45, 50), -1)
 right_run_1 = dodo.image_at((1, 200, 45, 60), -1)
 right_run_2 = dodo.image_at((50, 200, 45, 60), -1)
 right_run_3 = dodo.image_at((95, 200, 45, 60), -1)
@@ -25,14 +32,6 @@ right_run_3 = dodo.image_at((95, 200, 45, 60), -1)
 # sprite groups
 all_sprites = pygame.sprite.Group()
 platform_group = pygame.sprite.Group()
-player_group = pygame.sprite.Group()
-left_run_group = pygame.sprite.Group()
-right_run_group = pygame.sprite.Group()
-
-# player
-player = dodo.image_at((59, 50, 29, 40), -1)
-player_group.add(player)
-all_sprites.add(player)
 
 # left_run_list = dodo.load_grid_images(1, 3, x_margin, x_pad, y_margin, y_pad, width, height, -1)
 # right_run_list = [pg.transform.flip(player, True, False) for player in left_run_list]
@@ -52,10 +51,6 @@ while playing:
         if event.type == pygame.KEYDOWN:    # allow for q key to quit the game
             if event.key == pygame.K_q:
                 playing = False
-            if event.key == pygame.K_LEFT:
-                left_run = sprites.LeftRun(player.rect.center)
-                left_run_group.add(left_run)
-                all_sprites.add(left_run)
 
     screen.fill(BLUE)
     # screen.blit(left_run_1, (100, 100))
