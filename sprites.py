@@ -77,8 +77,12 @@ class Level:
         tile_sheet = SpriteSheet('assets/Ground.png')
         block = tile_sheet.image_at((32, 0, 30, 30))
         flower = tile_sheet.image_at((0, 0, 30, 30))
+        water = tile_sheet.image_at((35, 35, 30, 30))
+        sand = tile_sheet.image_at((0, 35, 30, 30))
         block = pygame.transform.scale(block, (TILE_SIZE, TILE_SIZE))
         flower = pygame.transform.scale(flower, (TILE_SIZE, TILE_SIZE))
+        water = pygame.transform.scale(water, (TILE_SIZE, TILE_SIZE))
+        sand = pygame.transform.scale(sand, (TILE_SIZE, TILE_SIZE))
 
         self.tile_list = []
 
@@ -101,6 +105,105 @@ class Level:
                     tile = (flower, image_rect)
                     self.tile_list.append(tile)
 
+                if col == "3":
+                    image_rect = water.get_rect()
+                    image_rect.x = x_val
+                    image_rect.y = y_val
+                    tile = (water, image_rect)
+                    self.tile_list.append(tile)
+
+                if col == "4":
+                    image_rect = sand.get_rect()
+                    image_rect.x = x_val
+                    image_rect.y = y_val
+                    tile = (sand, image_rect)
+                    self.tile_list.append(tile)
+
     def update(self):
         for tile in self.tile_list:
             SCREEN.blit(tile[0], tile[1])
+
+
+class Player:
+    def __init__(self, x, y, tile_size, tile):
+        self.x = x
+        self.y = y
+        self.tile_size = tile_size
+        self.tile = tile
+        self.stand_right = None
+        self.stand_left = None
+        self.run_right_list = []
+        self.run_left_list = None
+        self.load_images()
+        self.image = self.stand_right
+        self.image.get_rect()
+        self.last = pygame.time.get_ticks()
+        self.delay = 100
+        self.current_frame = 0
+        self.right = True
+        self.left = False
+
+        self.velocity_y = 0
+        self.jumping = False
+        self.falling = False
+
+    def update(self, display):
+        # create deltas
+        dx = 0
+        dy = 0
+
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_RIGHT]:
+            self.right = True
+            self.left = False
+            dx = 5
+            now = pygame.get_ticks()
+            if now - self.last >= self.delay:
+                self.last = now
+                if self.current_frame >= len(self.run_right_list):
+                    self.current_frame = 0
+                    self.current_frame = (self.current_frame + 1)
+                self.image = self.run_right_list[self.current_frame]
+                self.current_frame += 1
+        elif keys[pygame.K_LEFT]:
+            self.right = False
+            self.left = True
+            dx = -5
+            now = pygame.get_ticks()
+            if now - self.last >= self.delay:
+                self.last = now
+                if self.current_frame >= len(self.run_left_list):
+                    self.current_frame = 0
+                    self.current_frame = (self.current_frame + 1)
+                self.image = self.run_left_list[self.current_frame]
+                self.current_frame += 1
+        else:
+            dx = 0
+            self.current_frame = 0
+            if self.right:
+                self.image = self.stand_right
+            elif self.left:
+                self.image = self.stand_left
+        if keys[pygame.K_SPACE]:
+            self.jumping = True
+            dy = -10
+
+        self.rect.x += dx
+        self.rect.y += dy
+
+        display.blit(self.image, self.rect)
+
+        dodo = SpriteSheet("assets/dodo.png")
+        left_run_1 = dodo.image_at((4, 80, 45, 50), -1)
+        self.run_left_list.append(left_run_1)
+        left_run_2 = dodo.image_at((50, 75, 45, 50), -1)
+        self.run_left_list.append(left_run_2)
+        left_run_3 = dodo.image_at((100, 80, 45, 50), -1)
+        self.run_left_list.append(left_run_3)
+        right_run_1 = dodo.image_at((1, 200, 45, 60), -1)
+        self.run_left_list.append(right_run_1)
+        right_run_2 = dodo.image_at((50, 200, 45, 60), -1)
+        self.run_left_list.append(right_run_2)
+        right_run_3 = dodo.image_at((95, 200, 45, 60), -1)
+        self.run_left_list.append(right_run_3)
+

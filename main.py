@@ -10,24 +10,11 @@ from settings import *
 pygame.init()
 
 screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
-pygame.display.set_caption("Platformer")
+pygame.display.set_caption("Platform")
 
 # card_list = card.load_grid_images(4, 14, x_margin, x_pad, y_margin, y_pad)
 # print(card_list)
 
-dodo = sprites.SpriteSheet("assets/dodo.png")
-x_margin = 3
-y_margin = 81
-x_pad = 7
-y_pad = 0
-width = 50
-height = 50
-left_run_1 = dodo.image_at((4, 80, 45, 50), -1)
-left_run_2 = dodo.image_at((50, 75, 45, 50), -1)
-left_run_3 = dodo.image_at((100, 80, 45, 50), -1)
-right_run_1 = dodo.image_at((1, 200, 45, 60), -1)
-right_run_2 = dodo.image_at((50, 200, 45, 60), -1)
-right_run_3 = dodo.image_at((95, 200, 45, 60), -1)
 
 # sprite groups
 all_sprites = pygame.sprite.Group()
