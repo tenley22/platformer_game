@@ -75,10 +75,10 @@ class SpriteSheet:
 class Level:
     def __init__(self):
         tile_sheet = SpriteSheet('assets/Ground.png')
-        block = tile_sheet.image_at((32, 0, 30, 30))
+        block = tile_sheet.image_at((32, 0, 33, 33))
         flower = tile_sheet.image_at((0, 0, 30, 30))
         water = tile_sheet.image_at((35, 35, 30, 30))
-        sand = tile_sheet.image_at((0, 35, 30, 30))
+        sand = tile_sheet.image_at((0, 32, 33, 33))
         block = pygame.transform.scale(block, (TILE_SIZE, TILE_SIZE))
         flower = pygame.transform.scale(flower, (TILE_SIZE, TILE_SIZE))
         water = pygame.transform.scale(water, (TILE_SIZE, TILE_SIZE))
@@ -125,11 +125,12 @@ class Level:
 
 
 class Player:
-    def __init__(self, x, y, tile_size, tile):
+    def __init__(self, x, y, tile_size, tile_set, display):
         self.x = x
         self.y = y
+        self.display = display
         self.tile_size = tile_size
-        self.tile = tile
+        self.tile = tile_set
         self.stand_right = None
         self.stand_left = None
         self.run_right_list = []
@@ -184,26 +185,63 @@ class Player:
                 self.image = self.stand_right
             elif self.left:
                 self.image = self.stand_left
-        if keys[pygame.K_SPACE]:
+        if keys[pygame.K_SPACE] and not self.jumping and not self.falling:
             self.jumping = True
             dy = -10
+        if not keys[pygame.K_SPACE]:
+            self.jumping = False
 
-        self.rect.x += dx
-        self.rect.y += dy
+        self.velocity_y += 1
+        if self.velocity_y < 0:
+            self.jumping = True
+            self.falling = False
+        else:
+            self.jumping = False
+            self.falling = True
 
-        display.blit(self.image, self.rect)
+        # terminal velocity
+        if self.velocity_y >= 10:
+            self.velocity_y = 10
+
+        # update delta with velocity
+        dy += self.velocity_y
+
+        # tiles in layout list
+        for tile in self.tile_set:
+            if tile[1].colliderect(self.imate_rect.x+dx,self.image_rect.y,self.image_rect.width,self.image_rect.height):
+                dx = 0
+            if tile[1].colliderect(self.imate_rect.x,self.image_rect.y+dy,self.image_rect.width,self.image_rect.height):
+                # collision bottom of platform and top of player
+                if self.jumping:
+                    dy = tile[1].bottom - self.image_rect.top
+                    self.velocity_y = 0
+                    self.falling = True
+                    self.jumping = False
+                # collision top of platform and bottom of player
+                elif self.falling:
+                    dy = tile[1].top - self.image_rect.bottom
+                    self.velocity_y = 0
+                    self.falling = False
+
+        self.image_rect.x += dx
+        self.image_rect.y += dy
+
+        self.display.blit(self.image, self.image_rect)
 
         dodo = SpriteSheet("assets/dodo.png")
         left_run_1 = dodo.image_at((4, 80, 45, 50), -1)
         self.run_left_list.append(left_run_1)
         left_run_2 = dodo.image_at((50, 75, 45, 50), -1)
         self.run_left_list.append(left_run_2)
+        self.stand_left = left_run_2
         left_run_3 = dodo.image_at((100, 80, 45, 50), -1)
         self.run_left_list.append(left_run_3)
+
         right_run_1 = dodo.image_at((1, 200, 45, 60), -1)
-        self.run_left_list.append(right_run_1)
+        self.run_right_list.append(right_run_1)
         right_run_2 = dodo.image_at((50, 200, 45, 60), -1)
-        self.run_left_list.append(right_run_2)
+        self.run_right_list.append(right_run_2)
+        self.stand_right = right_run_2
         right_run_3 = dodo.image_at((95, 200, 45, 60), -1)
-        self.run_left_list.append(right_run_3)
+        self.run_right_list.append(right_run_3)
 

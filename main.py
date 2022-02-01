@@ -15,7 +15,7 @@ pygame.display.set_caption("Platform")
 # card_list = card.load_grid_images(4, 14, x_margin, x_pad, y_margin, y_pad)
 # print(card_list)
 
-
+#player = sprites.Player(100, 100, TILE_SIZE, LAYOUT, screen)
 # sprite groups
 all_sprites = pygame.sprite.Group()
 platform_group = pygame.sprite.Group()
