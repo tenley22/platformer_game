@@ -73,71 +73,77 @@ class SpriteSheet:
 
 
 class Level:
-    def __init__(self):
+    def __init__(self, size):
+        self.size = size
         tile_sheet = SpriteSheet('assets/Ground.png')
         block = tile_sheet.image_at((32, 0, 33, 33))
         flower = tile_sheet.image_at((0, 0, 30, 30))
         water = tile_sheet.image_at((35, 35, 30, 30))
         sand = tile_sheet.image_at((0, 32, 33, 33))
-        block = pygame.transform.scale(block, (TILE_SIZE, TILE_SIZE))
-        flower = pygame.transform.scale(flower, (TILE_SIZE, TILE_SIZE))
-        water = pygame.transform.scale(water, (TILE_SIZE, TILE_SIZE))
-        sand = pygame.transform.scale(sand, (TILE_SIZE, TILE_SIZE))
+        block = pygame.transform.scale(block, (size, size))
+        flower = pygame.transform.scale(flower, (size, size))
+        water = pygame.transform.scale(water, (size, size))
+        sand = pygame.transform.scale(sand, (size, size))
 
         self.tile_list = []
 
         for i, row in enumerate(LAYOUT):
             for j, col in enumerate(row):
-                x_val = j * TILE_SIZE
-                y_val = i * TILE_SIZE
+                x_val = j * size
+                y_val = i * size
 
                 if col == "1":
                     image_rect = block.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile = (block, image_rect)
-                    self.tile_list.append(tile)
+                    tile1 = (block, image_rect)
+                    self.tile_list.append(tile1)
 
                 if col == "2":
                     image_rect = flower.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile = (flower, image_rect)
-                    self.tile_list.append(tile)
+                    tile2 = (flower, image_rect)
+                    self.tile_list.append(tile2)
 
                 if col == "3":
                     image_rect = water.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile = (water, image_rect)
-                    self.tile_list.append(tile)
+                    tile3 = (water, image_rect)
+                    self.tile_list.append(tile3)
 
                 if col == "4":
                     image_rect = sand.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile = (sand, image_rect)
-                    self.tile_list.append(tile)
+                    tile4 = (sand, image_rect)
+                    self.tile_list.append(tile4)
 
     def update(self):
         for tile in self.tile_list:
-            SCREEN.blit(tile[0], tile[1])
+            SCREEN.blit(tile[0], tile[1], tile[2], tile[3])
+
+    def get_layout(self):
+        return self.tile_list
 
 
-class Player:
+class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, tile_size, tile_set, display):
+        pygame.sprite.Sprite.__init__(self)
         self.x = x
         self.y = y
-        self.display = display
         self.tile_size = tile_size
-        self.tile = tile_set
-        self.stand_right = None
-        self.stand_left = None
+        self.tile_set = tile_set
+        self.display = display
         self.run_right_list = []
-        self.run_left_list = None
+        self.run_left_list = []
         self.load_images()
-        self.image = self.stand_right
-        self.image.get_rect()
+        self.stand_right = self.run_right_list[1]
+        self.stand_left = None
+        self.load_images()
+        self.image = self.run_right_list[1]
+        self.image_rect = self.image.get_rect()
         self.last = pygame.time.get_ticks()
         self.delay = 100
         self.current_frame = 0
@@ -148,7 +154,7 @@ class Player:
         self.jumping = False
         self.falling = False
 
-    def update(self, display):
+    def update(self):
         # create deltas
         dx = 0
         dy = 0
@@ -208,9 +214,9 @@ class Player:
 
         # tiles in layout list
         for tile in self.tile_set:
-            if tile[1].colliderect(self.imate_rect.x+dx,self.image_rect.y,self.image_rect.width,self.image_rect.height):
+            if tile[1].colliderect(self.image_rect.x+dx,self.image_rect.y,self.image_rect.width,self.image_rect.height):
                 dx = 0
-            if tile[1].colliderect(self.imate_rect.x,self.image_rect.y+dy,self.image_rect.width,self.image_rect.height):
+            if tile[1].colliderect(self.image_rect.x,self.image_rect.y+dy,self.image_rect.width,self.image_rect.height):
                 # collision bottom of platform and top of player
                 if self.jumping:
                     dy = tile[1].bottom - self.image_rect.top
@@ -228,6 +234,7 @@ class Player:
 
         self.display.blit(self.image, self.image_rect)
 
+    def load_images(self):
         dodo = SpriteSheet("assets/dodo.png")
         left_run_1 = dodo.image_at((4, 80, 45, 50), -1)
         self.run_left_list.append(left_run_1)

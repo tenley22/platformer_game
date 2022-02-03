@@ -15,15 +15,22 @@ pygame.display.set_caption("Platform")
 # card_list = card.load_grid_images(4, 14, x_margin, x_pad, y_margin, y_pad)
 # print(card_list)
 
-#player = sprites.Player(100, 100, TILE_SIZE, LAYOUT, screen)
 # sprite groups
 all_sprites = pygame.sprite.Group()
 platform_group = pygame.sprite.Group()
+player_group = pygame.sprite.Group()
+
+layout = sprites.Level(TILE_SIZE)
+layout_list = layout.get_layout()
+
+player = sprites.Player(TILE_SIZE, WIN_HEIGHT - TILE_SIZE * 3, TILE_SIZE, layout, screen)
+player_group.add(player)
+all_sprites.add(player)
+
 
 # left_run_list = dodo.load_grid_images(1, 3, x_margin, x_pad, y_margin, y_pad, width, height, -1)
 # right_run_list = [pg.transform.flip(player, True, False) for player in left_run_list]
 
-layout = sprites.Level()
 
 playing = True
 
