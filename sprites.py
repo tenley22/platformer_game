@@ -77,7 +77,7 @@ class Level:
         self.size = size
         tile_sheet = SpriteSheet('assets/Ground.png')
         block = tile_sheet.image_at((32, 0, 33, 33))
-        flower = tile_sheet.image_at((0, 0, 30, 30))
+        flower = tile_sheet.image_at((0, 0, 33, 33))
         water = tile_sheet.image_at((35, 35, 30, 30))
         sand = tile_sheet.image_at((0, 32, 33, 33))
         block = pygame.transform.scale(block, (size, size))
@@ -96,33 +96,33 @@ class Level:
                     image_rect = block.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile1 = (block, image_rect)
-                    self.tile_list.append(tile1)
+                    tile = (block, image_rect)
+                    self.tile_list.append(tile)
 
                 if col == "2":
                     image_rect = flower.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile2 = (flower, image_rect)
-                    self.tile_list.append(tile2)
+                    tile = (flower, image_rect)
+                    self.tile_list.append(tile)
 
                 if col == "3":
                     image_rect = water.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile3 = (water, image_rect)
-                    self.tile_list.append(tile3)
+                    tile = (water, image_rect)
+                    self.tile_list.append(tile)
 
                 if col == "4":
                     image_rect = sand.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile4 = (sand, image_rect)
-                    self.tile_list.append(tile4)
+                    tile = (sand, image_rect)
+                    self.tile_list.append(tile)
 
     def update(self):
         for tile in self.tile_list:
-            SCREEN.blit(tile[0], tile[1], tile[2], tile[3])
+            SCREEN.blit(tile[0], tile[1])
 
     def get_layout(self):
         return self.tile_list
@@ -214,9 +214,11 @@ class Player(pygame.sprite.Sprite):
 
         # tiles in layout list
         for tile in self.tile_set:
-            if tile[1].colliderect(self.image_rect.x+dx,self.image_rect.y,self.image_rect.width,self.image_rect.height):
+            if tile[1].colliderect(self.image_rect.x+dx, self.image_rect.y, self.image_rect.width,
+                                   self.image_rect.height):
                 dx = 0
-            if tile[1].colliderect(self.image_rect.x,self.image_rect.y+dy,self.image_rect.width,self.image_rect.height):
+            if tile[1].colliderect(self.image_rect.x, self.image_rect.y+dy, self.image_rect.width,
+                                   self.image_rect.height):
                 # collision bottom of platform and top of player
                 if self.jumping:
                     dy = tile[1].bottom - self.image_rect.top
