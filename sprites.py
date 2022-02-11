@@ -75,8 +75,6 @@ class SpriteSheet:
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, tile_size, tile_set, display):
         pygame.sprite.Sprite.__init__(self)
-        self.x = x
-        self.y = y
         self.tile_size = tile_size
         self.tile_set = tile_set
         self.display = display
@@ -88,6 +86,8 @@ class Player(pygame.sprite.Sprite):
         self.load_images()
         self.image = self.run_right_list[1]
         self.image_rect = self.image.get_rect()
+        self.image_rect.x = x
+        self.image_rect.y = y
         self.last = pygame.time.get_ticks()
         self.delay = 100
         self.current_frame = 0
@@ -156,6 +156,10 @@ class Player(pygame.sprite.Sprite):
         # update delta with velocity
         dy += self.velocity_y
 
+        # create borders for the screen/camera scrolling
+        if self.x <= 100 or self.x >= WIN_WIDTH - 100:
+            dx = 0
+
         # tiles in layout list
         for tile in self.tile_set:
             if tile[1].colliderect(self.image_rect.x+dx, self.image_rect.y, self.image_rect.width,
@@ -199,8 +203,9 @@ class Player(pygame.sprite.Sprite):
         self.run_right_list.append(right_run_3)
 
 
-class Level:
+class Level(pygame.sprite.Sprite):
     def __init__(self, size):
+        pygame.sprite.Sprite.__init__(self)
         self.size = size
         tile_sheet = SpriteSheet('assets/Ground.png')
         block = tile_sheet.image_at((32, 0, 33, 33))
@@ -209,6 +214,7 @@ class Level:
         block = pygame.transform.scale(block, (size, size))
         water = pygame.transform.scale(water, (size, size))
         sand = pygame.transform.scale(sand, (size, size))
+        player_group = pygame.sprite.GroupSingle()
 
         self.tile_list = []
 
@@ -238,6 +244,13 @@ class Level:
                     tile = (sand, image_rect)
                     self.tile_list.append(tile)
 
+                if col == "P":
+                    player = Player(TILE_SIZE, WIN_HEIGHT - TILE_SIZE * 3, TILE_SIZE, LAYOUT, SCREEN)
+                    player.image_rect.x = x_val
+                    player.image_rect.y = y_val
+                    player_group.add(player)
+
+
     def update(self):
         for tile in self.tile_list:
             SCREEN.blit(tile[0], tile[1])
@@ -245,11 +258,3 @@ class Level:
     def get_layout(self):
         return self.tile_list
 
-    def get_player(self):
-        player = Player(TILE_SIZE, WIN_HEIGHT - TILE_SIZE * 3, TILE_SIZE, LAYOUT, SCREEN)
-        player_group = pygame.sprite.Group()
-        player_group.add(player)
-        player_group.draw(SCREEN)
-
-        player_x_coord = player.x
-        player_speed = player.dx
