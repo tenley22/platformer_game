@@ -76,7 +76,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, tile_size, tile_set, display):
         pygame.sprite.Sprite.__init__(self)
         self.tile_size = tile_size
-        self.tile_set = tile_set
+        self.tile_set = tile_set #
         self.display = display
         self.run_right_list = []
         self.run_left_list = []
@@ -108,7 +108,7 @@ class Player(pygame.sprite.Sprite):
             self.right = True
             self.left = False
             dx = 5
-            now = pygame.get_ticks()
+            now = pygame.time.get_ticks()
             if now - self.last >= self.delay:
                 self.last = now
                 if self.current_frame >= len(self.run_right_list):
@@ -120,7 +120,7 @@ class Player(pygame.sprite.Sprite):
             self.right = False
             self.left = True
             dx = -5
-            now = pygame.get_ticks()
+            now = pygame.time.get_ticks()
             if now - self.last >= self.delay:
                 self.last = now
                 if self.current_frame >= len(self.run_left_list):
@@ -137,7 +137,7 @@ class Player(pygame.sprite.Sprite):
                 self.image = self.stand_left
         if keys[pygame.K_SPACE] and not self.jumping and not self.falling:
             self.jumping = True
-            dy = -10
+            dy = -30
         if not keys[pygame.K_SPACE]:
             self.jumping = False
 
@@ -156,8 +156,10 @@ class Player(pygame.sprite.Sprite):
         # update delta with velocity
         dy += self.velocity_y
 
-        # create borders for the screen/camera scrolling
-        if self.x <= 100 or self.x >= WIN_WIDTH - 100:
+        # stopping player movement at camera borders
+        if self.image_rect.x <= 10 and self.left:
+            dx = 0
+        if self.image_rect.x >= WIN_WIDTH - 60 and self.right:
             dx = 0
 
         # tiles in layout list
@@ -186,35 +188,35 @@ class Player(pygame.sprite.Sprite):
 
     def load_images(self):
         dodo = SpriteSheet("assets/dodo.png")
-        left_run_1 = dodo.image_at((4, 80, 45, 50), -1)
-        self.run_left_list.append(left_run_1)
-        left_run_2 = dodo.image_at((50, 75, 45, 50), -1)
-        self.run_left_list.append(left_run_2)
-        self.stand_left = left_run_2
-        left_run_3 = dodo.image_at((100, 80, 45, 50), -1)
-        self.run_left_list.append(left_run_3)
-
-        right_run_1 = dodo.image_at((1, 200, 45, 60), -1)
+        right_run_1 = dodo.image_at((4, 80, 45, 50), -1)
         self.run_right_list.append(right_run_1)
-        right_run_2 = dodo.image_at((50, 200, 45, 60), -1)
+        right_run_2 = dodo.image_at((50, 75, 45, 50), -1)
         self.run_right_list.append(right_run_2)
         self.stand_right = right_run_2
-        right_run_3 = dodo.image_at((95, 200, 45, 60), -1)
+        right_run_3 = dodo.image_at((100, 80, 45, 50), -1)
         self.run_right_list.append(right_run_3)
+
+        left_run_1 = dodo.image_at((1, 200, 45, 60), -1)
+        self.run_left_list.append(left_run_1)
+        left_run_2 = dodo.image_at((50, 200, 45, 60), -1)
+        self.run_left_list.append(left_run_2)
+        self.stand_left = left_run_2
+        left_run_3 = dodo.image_at((95, 200, 45, 60), -1)
+        self.run_left_list.append(left_run_3)
 
 
 class Level(pygame.sprite.Sprite):
     def __init__(self, size):
         pygame.sprite.Sprite.__init__(self)
         self.size = size
-        tile_sheet = SpriteSheet('assets/Ground.png')
-        block = tile_sheet.image_at((32, 0, 33, 33))
-        water = tile_sheet.image_at((35, 35, 30, 30))
-        sand = tile_sheet.image_at((0, 32, 33, 33))
-        block = pygame.transform.scale(block, (size, size))
-        water = pygame.transform.scale(water, (size, size))
-        sand = pygame.transform.scale(sand, (size, size))
-        player_group = pygame.sprite.GroupSingle()
+        self.tile_sheet = SpriteSheet('assets/Ground.png')
+        self.block = self.tile_sheet.image_at((32, 0, 33, 33))
+        self.water = self.tile_sheet.image_at((35, 35, 30, 30))
+        self.sand = self.tile_sheet.image_at((0, 32, 33, 33))
+        self.block = pygame.transform.scale(self.block, (size, size))
+        self.water = pygame.transform.scale(self.water, (size, size))
+        self.sand = pygame.transform.scale(self.sand, (size, size))
+        self.player_group = pygame.sprite.GroupSingle()
 
         self.tile_list = []
 
@@ -224,36 +226,37 @@ class Level(pygame.sprite.Sprite):
                 y_val = i * size
 
                 if col == "1":
-                    image_rect = block.get_rect()
+                    image_rect = self.block.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile = (block, image_rect)
+                    tile = (self.block, image_rect)
                     self.tile_list.append(tile)
 
                 if col == "2":
-                    image_rect = water.get_rect()
+                    image_rect = self.water.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile = (water, image_rect)
+                    tile = (self.water, image_rect)
                     self.tile_list.append(tile)
 
                 if col == "3":
-                    image_rect = sand.get_rect()
+                    image_rect = self.sand.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile = (sand, image_rect)
+                    tile = (self.sand, image_rect)
                     self.tile_list.append(tile)
 
                 if col == "P":
-                    player = Player(TILE_SIZE, WIN_HEIGHT - TILE_SIZE * 3, TILE_SIZE, LAYOUT, SCREEN)
+                    player = Player(TILE_SIZE * 3, WIN_HEIGHT - TILE_SIZE * 3, TILE_SIZE, self.tile_list, SCREEN)
                     player.image_rect.x = x_val
                     player.image_rect.y = y_val
-                    player_group.add(player)
-
+                    self.player_group.add(player)
 
     def update(self):
         for tile in self.tile_list:
             SCREEN.blit(tile[0], tile[1])
+
+        self.player_group.update()
 
     def get_layout(self):
         return self.tile_list

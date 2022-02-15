@@ -23,7 +23,6 @@ layout = sprites.Level(TILE_SIZE)
 layout_list = layout.get_layout()
 layout_group.add(layout)
 
-
 # left_run_list = dodo.load_grid_images(1, 3, x_margin, x_pad, y_margin, y_pad, width, height, -1)
 # right_run_list = [pg.transform.flip(player, True, False) for player in left_run_list]
 
