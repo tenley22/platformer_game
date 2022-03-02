@@ -76,7 +76,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, tile_size, tile_set, display):
         pygame.sprite.Sprite.__init__(self)
         self.tile_size = tile_size
-        self.tile_set = tile_set #
+        self.tile_set = tile_set
         self.display = display
         self.run_right_list = []
         self.run_left_list = []
@@ -97,6 +97,7 @@ class Player(pygame.sprite.Sprite):
         self.velocity_y = 0
         self.jumping = False
         self.falling = False
+        self.tile_velocity = 0
 
     def update(self):
         # create deltas
@@ -135,10 +136,10 @@ class Player(pygame.sprite.Sprite):
                 self.image = self.stand_right
             elif self.left:
                 self.image = self.stand_left
-        if keys[pygame.K_SPACE] and not self.jumping and not self.falling:
+        if keys[pygame.K_UP] and not self.jumping and not self.falling:
             self.jumping = True
             dy = -30
-        if not keys[pygame.K_SPACE]:
+        if not keys[pygame.K_UP]:
             self.jumping = False
 
         self.velocity_y += 1
@@ -157,12 +158,19 @@ class Player(pygame.sprite.Sprite):
         dy += self.velocity_y
 
         # stopping player movement at camera borders
-        if self.image_rect.x <= 10 and self.left:
+        if self.image_rect.x <= 10 and self.left and keys[pygame.K_LEFT]:
             dx = 0
-        if self.image_rect.x >= WIN_WIDTH - 60 and self.right:
+            self.tile_velocity = 5
+        elif self.image_rect.x >= WIN_WIDTH - 60 and self.right and keys[pygame.K_RIGHT]:
             dx = 0
+            self.tile_velocity = -5
+        else:
+            self.tile_velocity = 0
+        for tile in self.tile_set:
+            tile[1][0] += self.tile_velocity
+            # tile[1] gets the rectangle with x,y coordinate and [0] gets just the x coordinate to add velocity to
 
-        # tiles in layout list
+            # tiles in layout list
         for tile in self.tile_set:
             if tile[1].colliderect(self.image_rect.x+dx, self.image_rect.y, self.image_rect.width,
                                    self.image_rect.height):
@@ -205,18 +213,64 @@ class Player(pygame.sprite.Sprite):
         self.run_left_list.append(left_run_3)
 
 
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self, x, y, tile_size, tile_set, display):
+        pygame.sprite.Sprite.__init__(self)
+        self.tile_size = tile_size
+        self.tile_set = tile_set
+        self.display = display
+        self.enemy_right_list = []
+        self.enemy_left_list = []
+        self.load_images()
+        self.enemy_stand_r = self.enemy_right_list[1]
+        self.enemy_stand_l = None
+        self.load_images()
+        self.image = self.enemy_right_list[1]
+        self.image_rect = self.image.get_rect()
+        self.image_rect.x = x
+        self.image_rect.y = y
+        self.last = pygame.time.get_ticks()
+        self.delay = 100
+        self.current_frame = 0
+        self.right = True
+        self.left = False
+
+    def update(self):
+        self.display.blit(self.image, self.image_rect)
+
+    def load_images(self):
+        enemy_d = SpriteSheet("assets/dodo_enemy.png")
+        enemy_right_1 = enemy_d.image_at((4, 80, 45, 50), -1)
+        self.enemy_right_list.append(enemy_right_1)
+        enemy_right_2 = enemy_d.image_at((50, 75, 45, 50), -1)
+        self.enemy_right_list.append(enemy_right_2)
+        self.enemy_stand_r = enemy_right_2
+        enemy_right_3 = enemy_d.image_at((100, 80, 45, 50), -1)
+        self.enemy_right_list.append(enemy_right_3)
+
+        enemy_left_1 = enemy_d.image_at((1, 200, 45, 60), -1)
+        self.enemy_left_list.append(enemy_left_1)
+        enemy_left_2 = enemy_d.image_at((50, 200, 45, 60), -1)
+        self.enemy_left_list.append(enemy_left_2)
+        self.enemy_stand_l = enemy_left_2
+        enemy_left_3 = enemy_d.image_at((95, 200, 45, 60), -1)
+        self.enemy_left_list.append(enemy_left_3)
+
+
 class Level(pygame.sprite.Sprite):
     def __init__(self, size):
         pygame.sprite.Sprite.__init__(self)
         self.size = size
         self.tile_sheet = SpriteSheet('assets/Ground.png')
-        self.block = self.tile_sheet.image_at((32, 0, 33, 33))
+        self.ground = self.tile_sheet.image_at((32, 0, 33, 33))
         self.water = self.tile_sheet.image_at((35, 35, 30, 30))
         self.sand = self.tile_sheet.image_at((0, 32, 33, 33))
-        self.block = pygame.transform.scale(self.block, (size, size))
+        self.ground = pygame.transform.scale(self.ground, (size, size))
         self.water = pygame.transform.scale(self.water, (size, size))
         self.sand = pygame.transform.scale(self.sand, (size, size))
         self.player_group = pygame.sprite.GroupSingle()
+        self.enemy_group = pygame.sprite.GroupSingle()
+        self.tile_velocity = 0
 
         self.tile_list = []
 
@@ -226,10 +280,10 @@ class Level(pygame.sprite.Sprite):
                 y_val = i * size
 
                 if col == "1":
-                    image_rect = self.block.get_rect()
+                    image_rect = self.ground.get_rect()
                     image_rect.x = x_val
                     image_rect.y = y_val
-                    tile = (self.block, image_rect)
+                    tile = (self.ground, image_rect)
                     self.tile_list.append(tile)
 
                 if col == "2":
@@ -252,11 +306,18 @@ class Level(pygame.sprite.Sprite):
                     player.image_rect.y = y_val
                     self.player_group.add(player)
 
+                if col == "E":
+                    enemy = Enemy(TILE_SIZE * 3, WIN_HEIGHT - TILE_SIZE * 3, TILE_SIZE, self.tile_list, SCREEN)
+                    enemy.image_rect.x = x_val
+                    enemy.image_rect.y = y_val
+                    self.enemy_group.add(enemy)
+
     def update(self):
         for tile in self.tile_list:
             SCREEN.blit(tile[0], tile[1])
 
         self.player_group.update()
+        self.enemy_group.update()
 
     def get_layout(self):
         return self.tile_list
