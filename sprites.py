@@ -1,5 +1,6 @@
 import pygame
 from settings import *
+import random
 
 
 class SpriteSheet:
@@ -157,7 +158,7 @@ class Player(pygame.sprite.Sprite):
         # update delta with velocity
         dy += self.velocity_y
 
-        # stopping player movement at camera borders
+        # CAMERA SCROLL
         if self.image_rect.x <= 10 and self.left and keys[pygame.K_LEFT]:
             dx = 0
             self.tile_velocity = 5
@@ -222,10 +223,10 @@ class Enemy(pygame.sprite.Sprite):
         self.enemy_right_list = []
         self.enemy_left_list = []
         self.load_images()
-        self.enemy_stand_r = self.enemy_right_list[1]
-        self.enemy_stand_l = None
+        self.enemy_stand_r = None
+        self.enemy_stand_l = self.enemy_left_list[1]
         self.load_images()
-        self.image = self.enemy_right_list[1]
+        self.image = self.enemy_left_list[1]
         self.image_rect = self.image.get_rect()
         self.image_rect.x = x
         self.image_rect.y = y
@@ -236,6 +237,35 @@ class Enemy(pygame.sprite.Sprite):
         self.left = False
 
     def update(self):
+        dx = 0
+        dy = 0
+        '''
+        for num in random.randint(2):
+            if num == 1:
+                self.right = True
+                self.left = False
+                dx = 5
+                now = pygame.time.get_ticks()
+                if now - self.last >= self.delay:
+                    self.last = now
+                    if self.current_frame >= len(self.enemy_right_list):
+                        self.current_frame = 0
+                        self.current_frame = (self.current_frame + 1)
+                    self.image = self.enemy_right_list[self.current_frame]
+                    self.current_frame += 1
+            else:
+                self.right = False
+                self.left = True
+                dx = -5
+                now = pygame.time.get_ticks()
+                if now - self.last >= self.delay:
+                    self.last = now
+                    if self.current_frame >= len(self.enemy_right_list):
+                        self.current_frame = 0
+                        self.current_frame = (self.current_frame + 1)
+                    self.image = self.enemy_right_list[self.current_frame]
+                    self.current_frame += 1
+        '''
         self.display.blit(self.image, self.image_rect)
 
     def load_images(self):
@@ -248,12 +278,12 @@ class Enemy(pygame.sprite.Sprite):
         enemy_right_3 = enemy_d.image_at((100, 80, 45, 50), -1)
         self.enemy_right_list.append(enemy_right_3)
 
-        enemy_left_1 = enemy_d.image_at((1, 200, 45, 60), -1)
+        enemy_left_1 = enemy_d.image_at((1, 200, 45, 55), -1)
         self.enemy_left_list.append(enemy_left_1)
-        enemy_left_2 = enemy_d.image_at((50, 200, 45, 60), -1)
+        enemy_left_2 = enemy_d.image_at((50, 200, 45, 55), -1)
         self.enemy_left_list.append(enemy_left_2)
         self.enemy_stand_l = enemy_left_2
-        enemy_left_3 = enemy_d.image_at((95, 200, 45, 60), -1)
+        enemy_left_3 = enemy_d.image_at((95, 200, 45, 55), -1)
         self.enemy_left_list.append(enemy_left_3)
 
 
@@ -307,7 +337,7 @@ class Level(pygame.sprite.Sprite):
                     self.player_group.add(player)
 
                 if col == "E":
-                    enemy = Enemy(TILE_SIZE * 3, WIN_HEIGHT - TILE_SIZE * 3, TILE_SIZE, self.tile_list, SCREEN)
+                    enemy = Enemy(TILE_SIZE, WIN_HEIGHT - TILE_SIZE, TILE_SIZE, self.tile_list, SCREEN)
                     enemy.image_rect.x = x_val
                     enemy.image_rect.y = y_val
                     self.enemy_group.add(enemy)
