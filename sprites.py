@@ -239,33 +239,37 @@ class Enemy(pygame.sprite.Sprite):
     def update(self):
         dx = 0
         dy = 0
-        '''
-        for num in random.randint(2):
-            if num == 1:
-                self.right = True
-                self.left = False
-                dx = 5
-                now = pygame.time.get_ticks()
-                if now - self.last >= self.delay:
-                    self.last = now
-                    if self.current_frame >= len(self.enemy_right_list):
-                        self.current_frame = 0
-                        self.current_frame = (self.current_frame + 1)
-                    self.image = self.enemy_right_list[self.current_frame]
-                    self.current_frame += 1
-            else:
-                self.right = False
-                self.left = True
-                dx = -5
-                now = pygame.time.get_ticks()
-                if now - self.last >= self.delay:
-                    self.last = now
-                    if self.current_frame >= len(self.enemy_right_list):
-                        self.current_frame = 0
-                        self.current_frame = (self.current_frame + 1)
-                    self.image = self.enemy_right_list[self.current_frame]
-                    self.current_frame += 1
-        '''
+        # make movement of the enemy more random or in opposite direction of player movement
+
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            self.right = True
+            self.left = False
+            dx = 5
+            now = pygame.time.get_ticks()
+            if now - self.last >= self.delay:
+                self.last = now
+                if self.current_frame >= len(self.enemy_right_list):
+                    self.current_frame = 0
+                    self.current_frame = (self.current_frame + 1)
+                self.image = self.enemy_right_list[self.current_frame]
+                self.current_frame += 1
+        elif keys[pygame.K_RIGHT]:
+            self.right = False
+            self.left = True
+            dx = -5
+            now = pygame.time.get_ticks()
+            if now - self.last >= self.delay:
+                self.last = now
+                if self.current_frame >= len(self.enemy_left_list):
+                    self.current_frame = 0
+                    self.current_frame = (self.current_frame + 1)
+                self.image = self.enemy_left_list[self.current_frame]
+                self.current_frame += 1
+
+        self.image_rect.x += dx
+        self.image_rect.y += dy
+
         self.display.blit(self.image, self.image_rect)
 
     def load_images(self):
@@ -275,7 +279,7 @@ class Enemy(pygame.sprite.Sprite):
         enemy_right_2 = enemy_d.image_at((50, 75, 45, 50), -1)
         self.enemy_right_list.append(enemy_right_2)
         self.enemy_stand_r = enemy_right_2
-        enemy_right_3 = enemy_d.image_at((100, 80, 45, 50), -1)
+        enemy_right_3 = enemy_d.image_at((100, 80, 42, 50), -1)
         self.enemy_right_list.append(enemy_right_3)
 
         enemy_left_1 = enemy_d.image_at((1, 200, 45, 55), -1)
