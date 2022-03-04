@@ -236,10 +236,14 @@ class Enemy(pygame.sprite.Sprite):
         self.right = True
         self.left = False
 
+        self.jumping = False
+        self.falling = False
+
     def update(self):
         dx = 0
         dy = 0
         # make movement of the enemy more random or in opposite direction of player movement
+        # & jumping/falling & collision
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
@@ -254,6 +258,7 @@ class Enemy(pygame.sprite.Sprite):
                     self.current_frame = (self.current_frame + 1)
                 self.image = self.enemy_right_list[self.current_frame]
                 self.current_frame += 1
+
         elif keys[pygame.K_RIGHT]:
             self.right = False
             self.left = True
@@ -266,6 +271,11 @@ class Enemy(pygame.sprite.Sprite):
                     self.current_frame = (self.current_frame + 1)
                 self.image = self.enemy_left_list[self.current_frame]
                 self.current_frame += 1
+
+        if self.image_rect.x <= 10 and self.left:
+            dx = 0
+        elif self.image_rect.x >= WIN_WIDTH - 60 and self.right:
+            dx = 0
 
         self.image_rect.x += dx
         self.image_rect.y += dy
