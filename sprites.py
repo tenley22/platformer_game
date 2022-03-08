@@ -236,6 +236,7 @@ class Enemy(pygame.sprite.Sprite):
         self.right = True
         self.left = False
 
+        self.velocity_y = 0
         self.jumping = False
         self.falling = False
 
@@ -271,11 +272,54 @@ class Enemy(pygame.sprite.Sprite):
                     self.current_frame = (self.current_frame + 1)
                 self.image = self.enemy_left_list[self.current_frame]
                 self.current_frame += 1
+        else:
+            dx = 0
+            self.current_frame = 0
+            if self.right:
+                self.image = self.enemy_stand_r
+            elif self.left:
+                self.image = self.enemy_stand_l
+        if keys[pygame.K_UP] and not self.jumping and not self.falling:
+            self.jumping = True
+            dy = -30
+        if not keys[pygame.K_UP]:
+            self.jumping = False
+
+        self.velocity_y += 1
+        if self.velocity_y < 0:
+            self.jumping = True
+            self.falling = False
+        else:
+            self.jumping = False
+            self.falling = True
+
+        # terminal velocity
+        if self.velocity_y >= 10:
+            self.velocity_y = 10
 
         if self.image_rect.x <= 10 and self.left:
             dx = 0
         elif self.image_rect.x >= WIN_WIDTH - 60 and self.right:
             dx = 0
+
+            # tiles in layout list
+        for tile in self.tile_set:
+            if tile[1].colliderect(self.image_rect.x+dx, self.image_rect.y, self.image_rect.width,
+                                   self.image_rect.height):
+                dx = 0
+            if tile[1].colliderect(self.image_rect.x, self.image_rect.y+dy, self.image_rect.width,
+                                   self.image_rect.height):
+                # collision bottom of platform and top of player
+                if self.jumping:
+                    dy = tile[1].bottom - self.image_rect.top
+                    self.velocity_y = 0
+                    self.falling = True
+                    self.jumping = False
+                # collision top of platform and bottom of player
+                elif self.falling:
+                    dy = tile[1].top - self.image_rect.bottom
+                    self.velocity_y = 0
+                    self.falling = False
 
         self.image_rect.x += dx
         self.image_rect.y += dy
