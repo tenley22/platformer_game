@@ -182,7 +182,6 @@ class Player(pygame.sprite.Sprite):
                 if self.jumping:
                     dy = tile[1].bottom - self.image_rect.top
                     self.velocity_y = 0
-                    self.falling = True
                     self.jumping = False
                 # collision top of platform and bottom of player
                 elif self.falling:
