@@ -179,7 +179,7 @@ class Player(pygame.sprite.Sprite):
             if tile[1].colliderect(self.image_rect.x, self.image_rect.y+dy, self.image_rect.width,
                                    self.image_rect.height):
                 # collision bottom of platform and top of player
-                if self.jumping:
+                if dy < 0:
                     dy = tile[1].bottom - self.image_rect.top
                     self.velocity_y = 0
                     self.jumping = False
@@ -214,16 +214,13 @@ class Player(pygame.sprite.Sprite):
 
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, x, y, tile_size, tile_set, display):
+    def __init__(self, x, y, display, value, tile_set):
         pygame.sprite.Sprite.__init__(self)
-        self.tile_size = tile_size
-        self.tile_set = tile_set
         self.display = display
+        self.tile_set = tile_set
         self.enemy_right_list = []
         self.enemy_left_list = []
-        self.load_images()
-        self.enemy_stand_r = None
-        self.enemy_stand_l = self.enemy_left_list[1]
+        self.value = value
         self.load_images()
         self.image = self.enemy_left_list[1]
         self.image_rect = self.image.get_rect()
@@ -240,88 +237,28 @@ class Enemy(pygame.sprite.Sprite):
         self.falling = False
 
     def update(self):
-        dx = 0
-        dy = 0
+        self.dx = 0
+        self.dy = 0
         # make movement of the enemy more random or in opposite direction of player movement
         # & jumping/falling & collision
 
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
+        if self.value > 0:
             self.right = True
             self.left = False
-            dx = 5
-            now = pygame.time.get_ticks()
-            if now - self.last >= self.delay:
-                self.last = now
-                if self.current_frame >= len(self.enemy_right_list):
-                    self.current_frame = 0
-                    self.current_frame = (self.current_frame + 1)
-                self.image = self.enemy_right_list[self.current_frame]
-                self.current_frame += 1
+            self.dx = self.value
 
-        elif keys[pygame.K_RIGHT]:
+        elif self.value < 0:
             self.right = False
             self.left = True
-            dx = -5
-            now = pygame.time.get_ticks()
-            if now - self.last >= self.delay:
-                self.last = now
-                if self.current_frame >= len(self.enemy_left_list):
-                    self.current_frame = 0
-                    self.current_frame = (self.current_frame + 1)
-                self.image = self.enemy_left_list[self.current_frame]
-                self.current_frame += 1
-        else:
-            dx = 0
-            self.current_frame = 0
-            if self.right:
-                self.image = self.enemy_stand_r
-            elif self.left:
-                self.image = self.enemy_stand_l
-        if keys[pygame.K_UP] and not self.jumping and not self.falling:
-            self.jumping = True
-            dy = -30
-        if not keys[pygame.K_UP]:
-            self.jumping = False
+            self.dx = self.value
 
-        self.velocity_y += 1
-        if self.velocity_y < 0:
-            self.jumping = True
-            self.falling = False
-        else:
-            self.jumping = False
-            self.falling = True
-
-        # terminal velocity
-        if self.velocity_y >= 10:
-            self.velocity_y = 10
-
-        if self.image_rect.x <= 10 and self.left:
-            dx = 0
-        elif self.image_rect.x >= WIN_WIDTH - 60 and self.right:
-            dx = 0
-
-            # tiles in layout list
         for tile in self.tile_set:
-            if tile[1].colliderect(self.image_rect.x+dx, self.image_rect.y, self.image_rect.width,
+            if tile[1].colliderect(self.image_rect.x+self.dx, self.image_rect.y, self.image_rect.width,
                                    self.image_rect.height):
-                dx = 0
-            if tile[1].colliderect(self.image_rect.x, self.image_rect.y+dy, self.image_rect.width,
-                                   self.image_rect.height):
-                # collision bottom of platform and top of player
-                if self.jumping:
-                    dy = tile[1].bottom - self.image_rect.top
-                    self.velocity_y = 0
-                    self.falling = True
-                    self.jumping = False
-                # collision top of platform and bottom of player
-                elif self.falling:
-                    dy = tile[1].top - self.image_rect.bottom
-                    self.velocity_y = 0
-                    self.falling = False
+                self.dy = -30
 
-        self.image_rect.x += dx
-        self.image_rect.y += dy
+        self.image_rect.x += self.dx
+        self.image_rect.y += self.dy
 
         self.display.blit(self.image, self.image_rect)
 
@@ -394,7 +331,7 @@ class Level(pygame.sprite.Sprite):
                     self.player_group.add(player)
 
                 if col == "E":
-                    enemy = Enemy(TILE_SIZE, WIN_HEIGHT - TILE_SIZE, TILE_SIZE, self.tile_list, SCREEN)
+                    enemy = Enemy(TILE_SIZE, WIN_HEIGHT - TILE_SIZE, SCREEN, 0, self.tile_list)
                     enemy.image_rect.x = x_val
                     enemy.image_rect.y = y_val
                     self.enemy_group.add(enemy)
