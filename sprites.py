@@ -214,10 +214,11 @@ class Player(pygame.sprite.Sprite):
 
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, x, y, display, value, tile_set):
+    def __init__(self, x, y, display, value, tile_set, tile_size):
         pygame.sprite.Sprite.__init__(self)
         self.display = display
         self.tile_set = tile_set
+        self.tile_size = tile_size
         self.enemy_right_list = []
         self.enemy_left_list = []
         self.value = value
@@ -246,16 +247,43 @@ class Enemy(pygame.sprite.Sprite):
             self.right = True
             self.left = False
             self.dx = self.value
+            self.falling = True
+            self.jumping = False
+            self.dy = 15
 
         elif self.value < 0:
             self.right = False
             self.left = True
             self.dx = self.value
+            self.falling = True
+            self.jumping = False
+            self.dy = 15
+
+        else:
+            self.right = True
+            self.left = False
+            self.dx = 0
+            self.falling = True
+            self.jumping = False
+            self.dy = 15
 
         for tile in self.tile_set:
             if tile[1].colliderect(self.image_rect.x+self.dx, self.image_rect.y, self.image_rect.width,
                                    self.image_rect.height):
-                self.dy = -30
+                self.dy = -self.tile_size/8
+                self.jumping = True
+                self.falling = False
+            if tile[1].colliderect(self.image_rect.x, self.image_rect.y + self.dy, self.image_rect.width,
+                                   self.image_rect.height):
+                if self.dy < 0:
+                    self.dy = tile[1].bottom - self.image_rect.top
+                    self.dy = 0
+                    self.jumping = False
+                    self.falling = True
+                elif self.falling:
+                    self.dy = tile[1].top - self.image_rect.bottom
+                    self.dy = 0
+                    self.falling = False
 
         self.image_rect.x += self.dx
         self.image_rect.y += self.dy
@@ -268,7 +296,6 @@ class Enemy(pygame.sprite.Sprite):
         self.enemy_right_list.append(enemy_right_1)
         enemy_right_2 = enemy_d.image_at((50, 75, 45, 50), -1)
         self.enemy_right_list.append(enemy_right_2)
-        self.enemy_stand_r = enemy_right_2
         enemy_right_3 = enemy_d.image_at((100, 80, 42, 50), -1)
         self.enemy_right_list.append(enemy_right_3)
 
@@ -276,7 +303,6 @@ class Enemy(pygame.sprite.Sprite):
         self.enemy_left_list.append(enemy_left_1)
         enemy_left_2 = enemy_d.image_at((50, 200, 45, 55), -1)
         self.enemy_left_list.append(enemy_left_2)
-        self.enemy_stand_l = enemy_left_2
         enemy_left_3 = enemy_d.image_at((95, 200, 45, 55), -1)
         self.enemy_left_list.append(enemy_left_3)
 
@@ -331,10 +357,11 @@ class Level(pygame.sprite.Sprite):
                     self.player_group.add(player)
 
                 if col == "E":
-                    enemy = Enemy(TILE_SIZE, WIN_HEIGHT - TILE_SIZE, SCREEN, 0, self.tile_list)
+                    enemy = Enemy(TILE_SIZE, WIN_HEIGHT - TILE_SIZE, SCREEN, -3, self.tile_list, TILE_SIZE)
                     enemy.image_rect.x = x_val
                     enemy.image_rect.y = y_val
                     self.enemy_group.add(enemy)
+
 
     def update(self):
         for tile in self.tile_list:
