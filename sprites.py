@@ -362,13 +362,13 @@ class Level(pygame.sprite.Sprite):
                     enemy.image_rect.y = y_val
                     self.enemy_group.add(enemy)
 
-
     def update(self):
-        for tile in self.tile_list:
-            SCREEN.blit(tile[0], tile[1])
 
         self.player_group.update()
         self.enemy_group.update()
+
+        for tile in self.tile_list:
+            SCREEN.blit(tile[0], tile[1])
 
     def get_layout(self):
         return self.tile_list
