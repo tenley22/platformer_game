@@ -233,13 +233,12 @@ class Enemy(pygame.sprite.Sprite):
         self.right = True
         self.left = False
 
-        self.velocity_y = 0
+        self.dx = 0
+        self.dy = 0
         self.jumping = False
         self.falling = False
 
     def update(self):
-        self.dx = 0
-        self.dy = 0
         # make movement of the enemy more random or in opposite direction of player movement
         # & jumping/falling & collision
 
@@ -351,7 +350,7 @@ class Level(pygame.sprite.Sprite):
                     self.tile_list.append(tile)
 
                 if col == "P":
-                    player = Player(TILE_SIZE * 3, WIN_HEIGHT - TILE_SIZE * 3, TILE_SIZE, self.tile_list, SCREEN)
+                    player = Player(TILE_SIZE, WIN_HEIGHT - TILE_SIZE, TILE_SIZE, self.tile_list, SCREEN)
                     player.image_rect.x = x_val
                     player.image_rect.y = y_val
                     self.player_group.add(player)
@@ -363,13 +362,11 @@ class Level(pygame.sprite.Sprite):
                     self.enemy_group.add(enemy)
 
     def update(self):
+        for tile in self.tile_list:
+            SCREEN.blit(tile[0], tile[1])
 
         self.player_group.update()
         self.enemy_group.update()
 
-        for tile in self.tile_list:
-            SCREEN.blit(tile[0], tile[1])
-
     def get_layout(self):
         return self.tile_list
-
