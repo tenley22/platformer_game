@@ -370,3 +370,20 @@ class Level(pygame.sprite.Sprite):
 
     def get_layout(self):
         return self.tile_list
+
+
+class Exit(pygame.sprite.Sprite):
+    def __init__(self, play):
+        pygame.sprite.Sprite.__init__(self)
+        self.play = play
+        self.image = play
+        self.image_rect = self.image.get_rect()
+        self.image_rect.x = self.x
+        self.image_rect.y = self.y
+
+    def update(self):
+        if self.y < WIN_WIDTH - 50:
+            return False
+
+
+
