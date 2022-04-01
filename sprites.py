@@ -365,7 +365,7 @@ class Level(pygame.sprite.Sprite):
         for tile in self.tile_list:
             SCREEN.blit(tile[0], tile[1])
 
-        player_enemy_collide = pygame.sprite.groupcollide(self.player_group, self.enemy_group, True, True)
+        #player_enemy_collide = pygame.sprite.groupcollide(self.player_group, self.enemy_group, True, True)
         #if player_enemy_collide:
             #stop the level and move to the game over screen
 

@@ -11,12 +11,32 @@ pygame.init()
 
 
 def start_screen():
+    # beginning screen
     screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
+    pygame.display.set_caption("Start Screen")
     clock = pygame.time.Clock()
 
-    text_object = FONT.render(f"Press Space to Begin", True, WHITE)
-    text_rect = text_object.get_rect()
-    text_rect.center = 300, 350
+    # press space to move on to level 1
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    running = False
+
+
+        screen.fill(PURPLE)
+        pygame.display.flip()
+        clock.tick(FPS)
+
+
+def game_over():
+    screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
+    pygame.display.set_caption("Start Screen")
+    clock = pygame.time.Clock()
 
     running = True
 
@@ -27,20 +47,16 @@ def start_screen():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     running = False
-
-        screen.fill(BLACK)
-
-        text_object = FONT.render(f"Press Space to Begin", True, WHITE)
-        screen.blit(text_object, text_rect)
-
+                elif event.key == pygame.K_RETURN:
+                    quit()
+        screen.fill(PURPLE)
         pygame.display.flip()
-
         clock.tick(FPS)
 
 
 def level_1():
     screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
-    pygame.display.set_caption("Platform")
+    pygame.display.set_caption("Platform Level 1")
 
     # card_list = card.load_grid_images(4, 14, x_margin, x_pad, y_margin, y_pad)
     # print(card_list)
@@ -80,5 +96,8 @@ def level_1():
 
 
 start_screen()
+while True:
+    level_1()
+    game_over()
 
 pygame.quit()
