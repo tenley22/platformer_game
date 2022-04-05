@@ -307,9 +307,10 @@ class Enemy(pygame.sprite.Sprite):
 
 
 class Level(pygame.sprite.Sprite):
-    def __init__(self, size):
+    def __init__(self, size, layout):
         pygame.sprite.Sprite.__init__(self)
         self.size = size
+        self.layout = layout
         self.tile_sheet = SpriteSheet('assets/Ground.png')
         self.ground = self.tile_sheet.image_at((32, 0, 33, 33))
         self.water = self.tile_sheet.image_at((35, 35, 30, 30))
@@ -323,7 +324,7 @@ class Level(pygame.sprite.Sprite):
 
         self.tile_list = []
 
-        for i, row in enumerate(LAYOUT):
+        for i, row in enumerate(layout):
             for j, col in enumerate(row):
                 x_val = j * size
                 y_val = i * size
