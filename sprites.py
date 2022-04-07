@@ -315,9 +315,11 @@ class Level(pygame.sprite.Sprite):
         self.ground = self.tile_sheet.image_at((32, 0, 33, 33))
         self.water = self.tile_sheet.image_at((35, 35, 30, 30))
         self.sand = self.tile_sheet.image_at((0, 32, 33, 33))
+        self.door = self.tile_sheet.image_at((0, 0, 33, 33))
         self.ground = pygame.transform.scale(self.ground, (size, size))
         self.water = pygame.transform.scale(self.water, (size, size))
         self.sand = pygame.transform.scale(self.sand, (size, size))
+        self.door = pygame.transform.scale(self.door, (size, size))
         self.player_group = pygame.sprite.GroupSingle()
         self.enemy_group = pygame.sprite.GroupSingle()
         self.tile_velocity = 0
@@ -350,6 +352,13 @@ class Level(pygame.sprite.Sprite):
                     tile = (self.sand, image_rect)
                     self.tile_list.append(tile)
 
+                if col == "4":
+                    image_rect = self.door.get_rect()
+                    image_rect.x = x_val
+                    image_rect.y = y_val
+                    tile = (self.door, image_rect, 1)
+                    self.tile_list.append(tile)
+
                 if col == "P":
                     player = Player(TILE_SIZE, WIN_HEIGHT - TILE_SIZE, TILE_SIZE, self.tile_list, SCREEN)
                     player.image_rect.x = x_val
@@ -375,4 +384,7 @@ class Level(pygame.sprite.Sprite):
 
     def get_layout(self):
         return self.tile_list
+
+    def get_images(self):
+        pass
 
