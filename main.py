@@ -17,6 +17,11 @@ def start_screen():
     clock = pygame.time.Clock()
 
     # press space to move on to level 1
+    start_text1 = 'press space key to begin'
+    start_text2 = 'or Q to quit'
+    font = pygame.font.SysFont('Arial', 30, True, False)
+    text1 = font.render(start_text1, True, WHITE)
+    text2 = font.render(start_text2, True, BG)
 
     running = True
     while running:
@@ -26,9 +31,13 @@ def start_screen():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     running = False
-
-
+                elif event.key == pygame.K_q:
+                    quit()
         screen.fill(PURPLE)
+
+        screen.blit(text1, [100, 100])
+        screen.blit(text2, [200, 200])
+
         pygame.display.flip()
         clock.tick(FPS)
 
@@ -39,6 +48,9 @@ def game_over():
     clock = pygame.time.Clock()
 
     running = True
+    end_text1 = 'game over! press Q to quit'
+    font = pygame.font.SysFont('Arial', 30, True, False)
+    text1 = font.render(end_text1, True, BLACK)
 
     while running:
         for event in pygame.event.get():
@@ -47,9 +59,12 @@ def game_over():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     running = False
-                elif event.key == pygame.K_RETURN:
+                elif event.key == pygame.K_q:
                     quit()
         screen.fill(PURPLE)
+
+        screen.blit(text1, [100, 100])
+
         pygame.display.flip()
         clock.tick(FPS)
 

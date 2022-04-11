@@ -357,6 +357,7 @@ class Level(pygame.sprite.Sprite):
                     image_rect.x = x_val
                     image_rect.y = y_val
                     tile = (self.door, image_rect, 1)
+                    # adding three values to determine level exit
                     self.tile_list.append(tile)
 
                 if col == "P":
