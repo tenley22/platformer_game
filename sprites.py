@@ -323,13 +323,16 @@ class Level(pygame.sprite.Sprite):
         self.player_group = pygame.sprite.GroupSingle()
         self.enemy_group = pygame.sprite.GroupSingle()
         self.tile_velocity = 0
+        self.blocks_group = pygame.sprite.Group()
 
         self.tile_list = []
 
-        for i, row in enumerate(layout):
+    def create_layout(self, level):
+        level_layout = self.layout[level - 1]
+        for i, row in enumerate(self.layout):
             for j, col in enumerate(row):
-                x_val = j * size
-                y_val = i * size
+                x_val = j * self.size
+                y_val = i * self.size
 
                 if col == "1":
                     image_rect = self.ground.get_rect()
@@ -376,16 +379,12 @@ class Level(pygame.sprite.Sprite):
         for tile in self.tile_list:
             SCREEN.blit(tile[0], tile[1])
 
-        #player_enemy_collide = pygame.sprite.groupcollide(self.player_group, self.enemy_group, True, True)
-        #if player_enemy_collide:
-            #stop the level and move to the game over screen
-
         self.player_group.update()
         self.enemy_group.update()
 
     def get_layout(self):
         return self.tile_list
 
-    def get_images(self):
-        pass
+    def get_groups(self):
+        return self.blocks_group
 

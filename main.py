@@ -8,6 +8,15 @@ from settings import *
 ############################################################
 
 pygame.init()
+# initialize all game elements
+pygame.init()
+screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
+pygame.display.set_caption("New Game")
+game_layout = sprites.Level(TILE_SIZE, LAYOUT)
+layout_list = game_layout.get_layout()
+player_group = pygame.sprite.Group()
+player = sprites.Player(TILE_SIZE, WIN_HEIGHT - TILE_SIZE, TILE_SIZE, layout_list, SCREEN)
+player_group.add(player)
 
 
 def start_screen():
@@ -69,23 +78,35 @@ def game_over():
         clock.tick(FPS)
 
 
-def level_1():
-    screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
-    pygame.display.set_caption("Platform Level 1")
+def reset_level(new_level):
+    global player, player_group, game_layout, layout_list
+    game_layout.blocks_group.empty()
+    player_group.empty()
 
-    # card_list = card.load_grid_images(4, 14, x_margin, x_pad, y_margin, y_pad)
-    # print(card_list)
+    # create new level
+    game_layout.create_layout(new_level)
+    layout_list = game_layout.get_layout()
+    player_group = pygame.sprite.Group()
+    player = sprites.Player(TILE_SIZE, WIN_HEIGHT - TILE_SIZE, TILE_SIZE, layout_list, SCREEN)
+    player_group.add(player)
+
+    return layout_list
+
+
+def game():
+    global player, player_group, game_layout, screen
+
+    level = 1
+    last_level = 2
+
+    layout_list = reset_level(level)
+    platforms = game_layout.get_groups()
+    screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 
     # sprite groups
     all_sprites = pygame.sprite.Group()
     layout_group = pygame.sprite.Group()
 
-    layout = sprites.Level(TILE_SIZE, LAYOUT)
-    layout_list = layout.get_layout()
-    layout_group.add(layout)
-
-    # left_run_list = dodo.load_grid_images(1, 3, x_margin, x_pad, y_margin, y_pad, width, height, -1)
-    # right_run_list = [pg.transform.flip(player, True, False) for player in left_run_list]
 
     playing = True
 
@@ -101,59 +122,29 @@ def level_1():
                 if event.key == pygame.K_q:
                     playing = False
 
-        screen.fill(BG)
-
-        # update
-        all_sprites.update()
-        layout_group.update()
-
-        pygame.display.flip()
-
-
-def level_2():
-    screen = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
-    pygame.display.set_caption("Platform Level 2")
-
-    # card_list = card.load_grid_images(4, 14, x_margin, x_pad, y_margin, y_pad)
-    # print(card_list)
-
-    # sprite groups
-    all_sprites = pygame.sprite.Group()
-    layout_group = pygame.sprite.Group()
-
-    layout = sprites.Level(TILE_SIZE, LAYOUT_2)
-    layout_list = layout.get_layout()
-    layout_group.add(layout)
-
-    # left_run_list = dodo.load_grid_images(1, 3, x_margin, x_pad, y_margin, y_pad, width, height, -1)
-    # right_run_list = [pg.transform.flip(player, True, False) for player in left_run_list]
-
-    playing = True
-
-    clock = pygame.time.Clock()
-
-    while playing:
-        clock.tick(FPS)
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                playing = False
-            if event.type == pygame.KEYDOWN:    # allow for q key to quit the game
-                if event.key == pygame.K_q:
+        for tile in layout_list:
+            if tile[1].colliderect(player.rect.x + 3, player.rect.y,
+                                   player.rect.width, player.rect.height) and len(tile) == 3:
+                level += 1
+                if level <= last_level:
+                    layout_list = reset_level(level)
+                else:
                     playing = False
 
         screen.fill(BG)
 
         # update
         all_sprites.update()
-        layout_group.update()
+        player.update()
+        platforms.update(screen)
 
         pygame.display.flip()
 
 
+running = True
 start_screen()
-while True:
-    level_1()
+while running:
+    game()
     game_over()
 
 pygame.quit()
