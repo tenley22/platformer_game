@@ -30,7 +30,7 @@ def start_screen():
     start_text2 = 'or Q to quit'
     font = pygame.font.SysFont('Arial', 30, True, False)
     text1 = font.render(start_text1, True, WHITE)
-    text2 = font.render(start_text2, True, BG)
+    text2 = font.render(start_text2, True, WHITE)
 
     running = True
     while running:
@@ -44,8 +44,8 @@ def start_screen():
                     quit()
         screen.fill(PURPLE)
 
-        screen.blit(text1, [100, 100])
-        screen.blit(text2, [200, 200])
+        screen.blit(text1, [200, 200])
+        screen.blit(text2, [300, 300])
 
         pygame.display.flip()
         clock.tick(FPS)
@@ -59,7 +59,7 @@ def game_over():
     running = True
     end_text1 = 'game over! press Q to quit'
     font = pygame.font.SysFont('Arial', 30, True, False)
-    text1 = font.render(end_text1, True, BLACK)
+    text1 = font.render(end_text1, True, WHITE)
 
     while running:
         for event in pygame.event.get():
@@ -72,7 +72,7 @@ def game_over():
                     quit()
         screen.fill(PURPLE)
 
-        screen.blit(text1, [100, 100])
+        screen.blit(text1, [200, 200])
 
         pygame.display.flip()
         clock.tick(FPS)
@@ -136,9 +136,12 @@ def game():
         # update
         all_sprites.update()
         player.update()
+        game_layout.update()
         platforms.update(screen)
 
         pygame.display.flip()
+
+    pygame.quit()
 
 
 running = True
