@@ -57,9 +57,9 @@ def game_over():
     clock = pygame.time.Clock()
 
     running = True
-    end_text1 = 'game over! press Q to quit'
+    end_text = 'game over! press Q to quit'
     font = pygame.font.SysFont('Arial', 30, True, False)
-    text1 = font.render(end_text1, True, WHITE)
+    text = font.render(end_text, True, WHITE)
 
     while running:
         for event in pygame.event.get():
@@ -72,7 +72,7 @@ def game_over():
                     quit()
         screen.fill(PURPLE)
 
-        screen.blit(text1, [200, 200])
+        screen.blit(text, [200, 200])
 
         pygame.display.flip()
         clock.tick(FPS)
